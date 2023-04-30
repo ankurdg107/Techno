@@ -25,8 +25,8 @@ jobs:
 
     runs-on: ubuntu-latest
     
-    env:
-      DB_URI: ${{ secrets.DB_URI}}
+#     env:
+#       DB_URI: ${{ secrets.DB_URI}}
 
     services:
       mongodb:
@@ -46,10 +46,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: |
-        curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.TOKEN }}" -d '{"pusher": "${{ github.actor }}", "repo": "${{ github.repository }}", "commitid": "${{ github.sha }}"}'
-    - run: |
-        ${{ secrets.TEST }}
     - run: |
         npm i
         npm run pro > api.txt &
