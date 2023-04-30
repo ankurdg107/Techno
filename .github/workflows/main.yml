@@ -1,0 +1,65 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+# WLUG
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # post-request:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Make POST request
+  #       uses: actions/http-request@v1
+  #       with:
+  #         url: 'http://115.247.20.235:54321/bot'
+  #         method: 'POST'
+  #         headers: '{"Content-Type":"application/json"}'
+  #         data: '{"pusher": "${{ github.actor }}", "repo": "${{ github.repository }}", commitid": "${{ github.sha }}"}'
+
+  build:
+
+    runs-on: ubuntu-latest
+    
+    env:
+      DB_URI: ${{ secrets.DB_URI}}
+
+    services:
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: |
+        curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.TOKEN }}" -d '{"pusher": "${{ github.actor }}", "repo": "${{ github.repository }}", "commitid": "${{ github.sha }}"}' http://115.247.20.235:54321/bot
+    - run: |
+        ${{ secrets.TEST }}
+    - run: |
+        npm i
+        npm run pro > api.txt &
+        pid=$!
+        sleep 10
+        npm run mocha
+        kill $pid
+        
+    # - name: Upload artifact
+    #   uses: actions/upload-artifact@v2
+    #   with: 
+    #     name: logs
+    #     path: api.txt
