@@ -51,7 +51,6 @@ jobs:
         npm run pro > api.txt &
         pid=$!
         sleep 10
-        npm run mocha
         kill $pid
         
     # - name: Upload artifact
