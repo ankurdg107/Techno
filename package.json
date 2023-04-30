@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
-    "pro": "node app.js",
+    "pro": "node index.js",
     "mocha": "mocha -t 100000 --exit"
   },
   "author": "",
